@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Video Agent Blueprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #00ffaa;
+    --accent2: #7b5ea7;
+    --accent3: #ff6b35;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --card: #13131f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    padding: 80px 40px 60px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,255,170,0.08), transparent 70%),
+                radial-gradient(ellipse 50% 40% at 80% 80%, rgba(123,94,167,0.1), transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid rgba(0,255,170,0.3);
+    padding: 4px 14px;
+    border-radius: 999px;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+
+  .hero h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(26px, 5vw, 48px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero-sub {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 560px;
+    margin: 0 auto 40px;
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* CONTAINER */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 56px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,255,170,0.08);
+    border: 1px solid rgba(0,255,170,0.2);
+    padding: 2px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0;
+  }
+
+  /* ARCH DIAGRAM */
+  .arch {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .arch::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  }
+
+  .arch-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pipe-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    text-align: center;
+    min-width: 110px;
+    flex-shrink: 0;
+  }
+
+  .pipe-icon {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  .pipe-label {
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .pipe-sub {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .pipe-arrow {
+    color: var(--accent);
+    font-size: 18px;
+    margin: 0 6px;
+    flex-shrink: 0;
+  }
+
+  /* TOOL CARDS */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .tool-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    transition: border-color 0.2s;
+  }
+
+  .tool-card:hover { border-color: rgba(0,255,170,0.3); }
+
+  .tool-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .tool-icon {
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .tool-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .tool-role {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .tool-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-top: 8px;
+    margin-right: 4px;
+  }
+
+  .tag-free { background: rgba(0,255,170,0.1); color: var(--accent); border: 1px solid rgba(0,255,170,0.2); }
+  .tag-gpu { background: rgba(123,94,167,0.15); color: #a884e0; border: 1px solid rgba(123,94,167,0.2); }
+  .tag-api { background: rgba(255,107,53,0.1); color: var(--accent3); border: 1px solid rgba(255,107,53,0.2); }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: #0d0d15;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  .code-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .code-lang {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  .code-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .dot-r { background: #ff5f56; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #27c93f; }
+
+  pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #c8c8d8;
+  }
+
+  .kw { color: #7b5ea7; }
+  .fn { color: #00ffaa; }
+  .str { color: #ffbd2e; }
+  .cm { color: #44445a; }
+  .var { color: #e8e8f0; }
+
+  /* STEP LIST */
+  .step-list {
+    counter-reset: steps;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .step-list li {
+    counter-increment: steps;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .step-list li::before {
+    content: counter(steps, decimal-leading-zero);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(0,255,170,0.08);
+    border: 1px solid rgba(0,255,170,0.2);
+    border-radius: 6px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-content strong {
+    display: block;
+    color: var(--text);
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .step-content span {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* WARN / INFO BOXES */
+  .info-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 13px;
+  }
+
+  .info-box.tip {
+    background: rgba(0,255,170,0.05);
+    border: 1px solid rgba(0,255,170,0.15);
+    color: #a0d8c8;
+  }
+
+  .info-box.warn {
+    background: rgba(255,107,53,0.05);
+    border: 1px solid rgba(255,107,53,0.15);
+    color: #d8b0a0;
+  }
+
+  .info-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+
+  /* PHASE TIMELINE */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--accent), var(--accent2), var(--accent3));
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -26px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+
+  .timeline-item:nth-child(2)::before { background: var(--accent2); }
+  .timeline-item:nth-child(3)::before { background: var(--accent3); }
+  .timeline-item:nth-child(4)::before { background: #3b9eff; }
+
+  .timeline-phase {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .timeline-item:nth-child(2) .timeline-phase { color: #a884e0; }
+  .timeline-item:nth-child(3) .timeline-phase { color: var(--accent3); }
+  .timeline-item:nth-child(4) .timeline-phase { color: #3b9eff; }
+
+  .timeline-desc {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  @media (max-width: 600px) {
+    .pipeline { gap: 4px; }
+    .pipe-arrow { display: none; }
+    .hero { padding: 40px 20px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">⚡ AI Agent Blueprint</div>
+  <h1>Build Your <span>AI Video Agent</span><br>From Scratch</h1>
+  <p class="hero-sub">A complete beginner's roadmap to automated viral video creation — free tools, RTX 4050 optimized, zero guesswork.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-val">100%</div><div class="stat-label">Free Tools</div></div>
+    <div class="stat"><div class="stat-val">RTX</div><div class="stat-label">GPU Optimized</div></div>
+    <div class="stat"><div class="stat-val">4</div><div class="stat-label">Core Phases</div></div>
+    <div class="stat"><div class="stat-val">Auto</div><div class="stat-label">Post to YT & IG</div></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- OVERVIEW -->
+  <div class="section">
+    <div class="arch">
+      <div class="arch-title">// Full Agent Pipeline</div>
+      <div class="pipeline">
+        <div class="pipe-node">
+          <div class="pipe-icon">📡</div>
+          <div class="pipe-label">TREND</div>
+          <div class="pipe-sub">Detect</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node">
+          <div class="pipe-icon">✍️</div>
+          <div class="pipe-label">SCRIPT</div>
+          <div class="pipe-sub">Generate</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node">
+          <div class="pipe-icon">🖼️</div>
+          <div class="pipe-label">VISUALS</div>
+          <div class="pipe-sub">AI Images</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node">
+          <div class="pipe-icon">🎙️</div>
+          <div class="pipe-label">VOICE</div>
+          <div class="pipe-sub">TTS/ASMR</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node">
+          <div class="pipe-icon">🎬</div>
+          <div class="pipe-label">RENDER</div>
+          <div class="pipe-sub">Compose</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node">
+          <div class="pipe-icon">🚀</div>
+          <div class="pipe-label">PUBLISH</div>
+          <div class="pipe-sub">Auto-Post</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box tip">
+      <div class="info-icon">💡</div>
+      <div>Your RTX 4050 has CUDA cores that dramatically accelerate AI image/video generation. Every tool in this guide is configured to take full advantage of your GPU — you'll generate content 5–20× faster than CPU-only setups.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PHASE 1: SETUP -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-num">PHASE 01</span>
+      <span class="section-title">Environment Setup</span>
+    </div>
+    <p style="color:var(--muted); margin-bottom:20px;">Install your foundation before anything else. This takes about 30–60 minutes but you only do it once.</p>
+
+    <ol class="step-list">
+      <li>
+        <div class="step-content">
+          <strong>Install Python 3.11</strong>
+          <span>Download from python.org. During install, check "Add Python to PATH". Python is the language your agent will be written in.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <strong>Install CUDA Toolkit 12.x (NVIDIA)</strong>
+          <span>Go to developer.nvidia.com/cuda-downloads. Select Windows → your version → exe (local). This unlocks your RTX 4050 for AI workloads.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <strong>Install Git + Visual Studio Code</strong>
+          <span>Git from git-scm.com and VS Code from code.visualstudio.com. VS Code is your coding environment. Install the "Python" extension inside it.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <strong>Create a Project Folder & Virtual Environment</strong>
+          <span>Open a terminal in VS Code and run the commands below. A virtual environment keeps your project's packages isolated.</span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">BASH — Terminal Commands</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><span class="cm"># Create your project folder</span>
+<span class="fn">mkdir</span> ai-video-agent <span class="kw">&&</span> <span class="fn">cd</span> ai-video-agent
+
+<span class="cm"># Create and activate a virtual environment</span>
+<span class="fn">python</span> -m venv venv
+<span class="var">venv\Scripts\activate</span>          <span class="cm"># Windows</span>
+
+<span class="cm"># Install PyTorch with CUDA support (for RTX 4050)</span>
+<span class="fn">pip</span> install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+<span class="cm"># Verify GPU is detected</span>
+<span class="fn">python</span> -c <span class="str">"import torch; print(torch.cuda.is_available())"</span>
+<span class="cm"># Should print: True</span></pre>
+    </div>
+
+    <li>
+      <div class="step-content">
+        <strong>Install Ollama (Free Local AI Brain)</strong>
+        <span>Go to ollama.com and download for Windows. This runs an LLM locally — no API costs, no limits.</span>
+      </div>
+    </li>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">BASH — Pull an LLM model</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><span class="cm"># After installing Ollama, pull a fast model</span>
+<span class="fn">ollama</span> pull mistral
+
+<span class="cm"># Test it</span>
+<span class="fn">ollama</span> run mistral <span class="str">"Write a viral YouTube title about ASMR"</span></pre>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PHASE 2: TOOLS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-num">PHASE 02</span>
+      <span class="section-title">Your Toolstack (All Free)</span>
+    </div>
+    <p style="color:var(--muted); margin-bottom:20px;">One tool for each job. Install these after your environment is ready.</p>
+
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-icon">📡</div>
+          <div>
+            <div class="tool-name">PyTrends</div>
+            <div class="tool-role">Trend Detection</div>
+          </div>
+        </div>
+        <div class="tool-desc">Unofficial Google Trends API. Finds what's spiking in real-time across categories like entertainment, baby content, ASMR, etc.</div>
+        <span class="tag tag-free">FREE</span>
+        <span class="tag tag-api">pip install pytrends</span>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-icon">🧠</div>
+          <div>
+            <div class="tool-name">Ollama + Mistral</div>
+            <div class="tool-role">Script & Title AI</div>
+          </div>
+        </div>
+        <div class="tool-desc">Runs an LLM on your PC for free. Generates scripts, titles, hashtags, and video concepts tailored to trends.</div>
+        <span class="tag tag-free">FREE</span>
+        <span class="tag tag-gpu">GPU Accelerated</span>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-icon">🖼️</div>
+          <div>
+            <div class="tool-name">Stable Diffusion (AUTOMATIC1111)</div>
+            <div class="tool-role">AI Image Generation</div>
+          </div>
+        </div>
+        <div class="tool-desc">Industry-standard free AI image generator. Your RTX 4050 can generate a high-quality image in under 5 seconds.</div>
+        <span class="tag tag-free">FREE</span>
+        <span class="tag tag-gpu">RTX 4050 Optimized</span>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-icon">🎙️</div>
+          <div>
+            <div class="tool-name">Bark (by Suno)</div>
+            <div class="tool-role">AI Voice / ASMR</div>
+          </div>
+        </div>
+        <div class="tool-desc">Generates ultra-realistic speech, whispers (ASMR), sound effects, and music. Runs locally on your GPU for free.</div>
+        <span class="tag tag-free">FREE</span>
+        <span class="tag tag-gpu">GPU Accelerated</span>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-icon">🎬</div>
+          <div>
+            <div class="tool-name">MoviePy + FFmpeg</div>
+            <div class="tool-role">Video Assembly</div>
+          </div>
+        </div>
+        <div class="tool-desc">Combines your images, voiceover, music, and captions into a finished video file. The glue of your pipeline.</div>
+        <span class="tag tag-free">FREE</span>
+        <span class="tag tag-api">pip install moviepy</span>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-icon">🚀</div>
+          <div>
+            <div class="tool-name">YouTube Data API v3</div>
+            <div class="tool-role">Auto-Upload</div>
+          </div>
+        </div>
+        <div class="tool-desc">Google's official free API for uploading videos, setting titles/descriptions/tags, and scheduling posts automatically.</div>
+        <span class="tag tag-free">FREE</span>
+        <span class="tag tag-api">Google Console</span>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-icon">📸</div>
+          <div>
+            <div class="tool-name">Instagrapi</div>
+            <div class="tool-role">Instagram Auto-Post</div>
+          </div>
+        </div>
+        <div class="tool-desc">Python library to post Reels/photos to Instagram automatically. Handles login, captions, hashtags, and scheduling.</div>
+        <span class="tag tag-free">FREE</span>
+        <span class="tag tag-api">pip install instagrapi</span>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-icon">⏰</div>
+          <div>
+            <div class="tool-name">APScheduler</div>
+            <div class="tool-role">Scheduling / Automation</div>
+          </div>
+        </div>
+        <div class="tool-desc">Schedules your agent to run automatically — e.g., generate and post 3 videos daily at peak hours, no human needed.</div>
+        <span class="tag tag-free">FREE</span>
+        <span class="tag tag-api">pip install apscheduler</span>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">BASH — Install all Python packages at once</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><span class="fn">pip</span> install pytrends ollama moviepy apscheduler \
+            instagrapi google-api-python-client \
+            google-auth-httplib2 google-auth-oauthlib \
+            bark pillow requests python-dotenv</pre>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PHASE 3: CODE -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-num">PHASE 03</span>
+      <span class="section-title">Agent Code Walkthrough</span>
+    </div>
+    <p style="color:var(--muted); margin-bottom:20px;">Below is the core structure of your agent. Create these files in your project folder.</p>
+
+    <!-- STEP 3A: Trend -->
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Space Mono',monospace; color:var(--accent); font-size:13px; margin-bottom:8px;">① trend_scout.py — Find what's viral right now</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">PYTHON</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <pre><span class="kw">from</span> <span class="var">pytrends.request</span> <span class="kw">import</span> <span class="fn">TrendReq</span>
+
+<span class="kw">def</span> <span class="fn">get_trending_topics</span>(<span class="var">niche</span>=<span class="str">"ASMR"</span>):
+    <span class="var">pytrends</span> = <span class="fn">TrendReq</span>(<span class="var">hl</span>=<span class="str">'en-US'</span>, <span class="var">tz</span>=<span class="var">360</span>)
+    <span class="var">pytrends</span>.<span class="fn">build_payload</span>(
+        [<span class="var">niche</span>], <span class="var">cat</span>=<span class="var">0</span>,
+        <span class="var">timeframe</span>=<span class="str">'now 1-d'</span>,  <span class="cm"># last 24 hours</span>
+        <span class="var">geo</span>=<span class="str">''</span>
+    )
+    <span class="var">related</span> = <span class="var">pytrends</span>.<span class="fn">related_queries</span>()
+    <span class="cm"># Extract top rising queries</span>
+    <span class="var">rising</span> = <span class="var">related</span>[<span class="var">niche</span>][<span class="str">'rising'</span>]
+    <span class="kw">return</span> <span class="var">rising</span>[<span class="str">'query'</span>].<span class="fn">tolist</span>()[:5]
+
+<span class="cm"># Example output: ['asmr rain sounds', 'asmr sleep 2025', ...]</span></pre>
+      </div>
+    </div>
+
+    <!-- STEP 3B: Script -->
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Space Mono',monospace; color:var(--accent); font-size:13px; margin-bottom:8px;">② script_gen.py — AI writes your video script</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">PYTHON</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <pre><span class="kw">import</span> <span class="var">ollama</span>
+
+<span class="kw">def</span> <span class="fn">generate_script</span>(<span class="var">topic</span>: <span class="fn">str</span>) -> <span class="fn">dict</span>:
+    <span class="var">prompt</span> = <span class="str">f"""
+    Create a viral YouTube Shorts video plan for: {topic}
+    
+    Return EXACTLY this JSON format:
+    {{
+      "title": "clickbait YouTube title under 60 chars",
+      "description": "SEO description with keywords",
+      "hashtags": ["tag1", "tag2", "tag3"],
+      "scenes": [
+        {{"narration": "text to speak", "visual": "image description for AI"}}
+      ]
+    }}
+    Keep scenes between 3-5. Make it engaging and trending.
+    """</span>
+    
+    <span class="var">response</span> = <span class="var">ollama</span>.<span class="fn">chat</span>(
+        <span class="var">model</span>=<span class="str">'mistral'</span>,
+        <span class="var">messages</span>=[{<span class="str">'role'</span>: <span class="str">'user'</span>, <span class="str">'content'</span>: <span class="var">prompt</span>}]
+    )
+    <span class="kw">import</span> <span class="var">json</span>
+    <span class="kw">return</span> <span class="var">json</span>.<span class="fn">loads</span>(<span class="var">response</span>[<span class="str">'message'</span>][<span class="str">'content'</span>])</pre>
+      </div>
+    </div>
+
+    <!-- STEP 3C: Images -->
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Space Mono',monospace; color:var(--accent); font-size:13px; margin-bottom:8px;">③ image_gen.py — Generate visuals via Stable Diffusion API</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">PYTHON</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <pre><span class="kw">import</span> <span class="var">requests, base64</span>
+<span class="kw">from</span> <span class="var">PIL</span> <span class="kw">import</span> <span class="fn">Image</span>
+<span class="kw">import</span> <span class="var">io</span>
+
+<span class="cm"># AUTOMATIC1111 must be running with --api flag</span>
+<span class="cm"># Start it with: python launch.py --api --xformers</span>
+<span class="var">SD_URL</span> = <span class="str">"http://127.0.0.1:7860"</span>
+
+<span class="kw">def</span> <span class="fn">generate_image</span>(<span class="var">prompt</span>: <span class="fn">str</span>, <span class="var">output_path</span>: <span class="fn">str</span>):
+    <span class="var">payload</span> = {
+        <span class="str">"prompt"</span>: <span class="var">prompt</span> + <span class="str">", 4k, cinematic, trending"</span>,
+        <span class="str">"negative_prompt"</span>: <span class="str">"blurry, ugly, watermark"</span>,
+        <span class="str">"steps"</span>: <span class="var">20</span>,        <span class="cm"># Fast on RTX 4050</span>
+        <span class="str">"width"</span>: <span class="var">576</span>,        <span class="cm"># Vertical (9:16 for Shorts)</span>
+        <span class="str">"height"</span>: <span class="var">1024</span>,
+        <span class="str">"cfg_scale"</span>: <span class="var">7</span>,
+        <span class="str">"sampler_name"</span>: <span class="str">"DPM++ 2M Karras"</span>
+    }
+    <span class="var">r</span> = <span class="var">requests</span>.<span class="fn">post</span>(<span class="str">f"{SD_URL}/sdapi/v1/txt2img"</span>, <span class="var">json</span>=<span class="var">payload</span>)
+    <span class="var">img_data</span> = <span class="var">base64</span>.<span class="fn">b64decode</span>(<span class="var">r</span>.<span class="fn">json</span>()[<span class="str">'images'</span>][<span class="var">0</span>])
+    <span class="var">Image</span>.<span class="fn">open</span>(<span class="var">io</span>.<span class="fn">BytesIO</span>(<span class="var">img_data</span>)).<span class="fn">save</span>(<span class="var">output_path</span>)
+    <span class="kw">return</span> <span class="var">output_path</span></pre>
+      </div>
+    </div>
+
+    <!-- STEP 3D: Voice -->
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Space Mono',monospace; color:var(--accent); font-size:13px; margin-bottom:8px;">④ voice_gen.py — AI voice / ASMR narration</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">PYTHON</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <pre><span class="kw">from</span> <span class="var">bark</span> <span class="kw">import</span> <span class="fn">SAMPLE_RATE, generate_audio, preload_models</span>
+<span class="kw">from</span> <span class="var">scipy.io.wavfile</span> <span class="kw">import</span> <span class="fn">write</span> <span class="kw">as</span> <span class="fn">write_wav</span>
+<span class="kw">import</span> <span class="var">numpy as np</span>
+
+<span class="fn">preload_models</span>()  <span class="cm"># Downloads models once, runs on GPU</span>
+
+<span class="kw">def</span> <span class="fn">generate_voiceover</span>(<span class="var">text</span>: <span class="fn">str</span>, <span class="var">output_path</span>: <span class="fn">str</span>,
+                        <span class="var">asmr_mode</span>=<span class="fn">False</span>):
+    <span class="cm"># Bark voice presets: v2/en_speaker_0 through _9</span>
+    <span class="var">voice</span> = <span class="str">"v2/en_speaker_6"</span>
+    
+    <span class="kw">if</span> <span class="var">asmr_mode</span>:
+        <span class="cm"># Add whisper tags for ASMR effect</span>
+        <span class="var">text</span> = <span class="str">f"[whisper]{text}[/whisper]"</span>
+    
+    <span class="var">audio_array</span> = <span class="fn">generate_audio</span>(<span class="var">text</span>, <span class="var">history_prompt</span>=<span class="var">voice</span>)
+    <span class="fn">write_wav</span>(<span class="var">output_path</span>, <span class="fn">SAMPLE_RATE</span>, <span class="var">audio_array</span>)
+    <span class="kw">return</span> <span class="var">output_path</span></pre>
+      </div>
+    </div>
+
+    <!-- STEP 3E: Video -->
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Space Mono',monospace; color:var(--accent); font-size:13px; margin-bottom:8px;">⑤ video_composer.py — Assemble the final video</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">PYTHON</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <pre><span class="kw">from</span> <span class="var">moviepy.editor</span> <span class="kw">import</span> (
+    <span class="fn">ImageClip, AudioFileClip, concatenate_videoclips,
+    TextClip, CompositeVideoClip</span>
+)
+
+<span class="kw">def</span> <span class="fn">compose_video</span>(<span class="var">scenes</span>: <span class="fn">list</span>, <span class="var">output_path</span>: <span class="fn">str</span>):
+    <span class="var">clips</span> = []
+    
+    <span class="kw">for</span> <span class="var">i, scene</span> <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">scenes</span>):
+        <span class="cm"># Load image and audio for each scene</span>
+        <span class="var">audio</span> = <span class="fn">AudioFileClip</span>(<span class="var">scene</span>[<span class="str">'audio'</span>])
+        <span class="var">img</span> = (<span class="fn">ImageClip</span>(<span class="var">scene</span>[<span class="str">'image'</span>])
+               .<span class="fn">set_duration</span>(<span class="var">audio</span>.<span class="var">duration</span>)
+               .<span class="fn">set_audio</span>(<span class="var">audio</span>))
+        
+        <span class="cm"># Add caption text overlay</span>
+        <span class="var">txt</span> = (<span class="fn">TextClip</span>(<span class="var">scene</span>[<span class="str">'narration'</span>], <span class="var">fontsize</span>=<span class="var">40</span>,
+                       <span class="var">color</span>=<span class="str">'white'</span>, <span class="var">font</span>=<span class="str">'Arial-Bold'</span>,
+                       <span class="var">size</span>=(<span class="var">540</span>, <span class="fn">None</span>), <span class="var">method</span>=<span class="str">'caption'</span>)
+               .<span class="fn">set_duration</span>(<span class="var">audio</span>.<span class="var">duration</span>)
+               .<span class="fn">set_pos</span>((<span class="str">'center'</span>, <span class="str">'bottom'</span>)))
+        
+        <span class="var">clips</span>.<span class="fn">append</span>(<span class="fn">CompositeVideoClip</span>([<span class="var">img</span>, <span class="var">txt</span>]))
+    
+    <span class="var">final</span> = <span class="fn">concatenate_videoclips</span>(<span class="var">clips</span>)
+    <span class="var">final</span>.<span class="fn">write_videofile</span>(<span class="var">output_path</span>, <span class="var">fps</span>=<span class="var">30</span>, <span class="var">codec</span>=<span class="str">'libx264'</span>)
+    <span class="kw">return</span> <span class="var">output_path</span></pre>
+      </div>
+    </div>
+
+    <!-- STEP 3F: Uploader -->
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Space Mono',monospace; color:var(--accent); font-size:13px; margin-bottom:8px;">⑥ uploader.py — Auto-post to YouTube & Instagram</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">PYTHON</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <pre><span class="cm"># ─── YouTube Upload ───────────────────────────</span>
+<span class="kw">from</span> <span class="var">googleapiclient.discovery</span> <span class="kw">import</span> <span class="fn">build</span>
+<span class="kw">from</span> <span class="var">googleapiclient.http</span> <span class="kw">import</span> <span class="fn">MediaFileUpload</span>
+<span class="kw">from</span> <span class="var">google.oauth2.credentials</span> <span class="kw">import</span> <span class="fn">Credentials</span>
+
+<span class="kw">def</span> <span class="fn">upload_to_youtube</span>(<span class="var">video_path</span>, <span class="var">title</span>, <span class="var">description</span>, <span class="var">tags</span>):
+    <span class="var">creds</span> = <span class="fn">Credentials</span>.<span class="fn">from_authorized_user_file</span>(<span class="str">'token.json'</span>)
+    <span class="var">yt</span> = <span class="fn">build</span>(<span class="str">'youtube'</span>, <span class="str">'v3'</span>, <span class="var">credentials</span>=<span class="var">creds</span>)
+    
+    <span class="var">request</span> = <span class="var">yt</span>.<span class="fn">videos</span>().<span class="fn">insert</span>(
+        <span class="var">part</span>=<span class="str">"snippet,status"</span>,
+        <span class="var">body</span>={
+            <span class="str">"snippet"</span>: {
+                <span class="str">"title"</span>: <span class="var">title</span>,
+                <span class="str">"description"</span>: <span class="var">description</span>,
+                <span class="str">"tags"</span>: <span class="var">tags</span>,
+                <span class="str">"categoryId"</span>: <span class="str">"22"</span>  <span class="cm"># People & Blogs</span>
+            },
+            <span class="str">"status"</span>: {<span class="str">"privacyStatus"</span>: <span class="str">"public"</span>}
+        },
+        <span class="var">media_body</span>=<span class="fn">MediaFileUpload</span>(<span class="var">video_path</span>)
+    )
+    <span class="kw">return</span> <span class="var">request</span>.<span class="fn">execute</span>()
+
+<span class="cm"># ─── Instagram Upload ─────────────────────────</span>
+<span class="kw">from</span> <span class="var">instagrapi</span> <span class="kw">import</span> <span class="fn">Client</span>
+
+<span class="kw">def</span> <span class="fn">upload_to_instagram</span>(<span class="var">video_path</span>, <span class="var">caption</span>, <span class="var">hashtags</span>):
+    <span class="var">cl</span> = <span class="fn">Client</span>()
+    <span class="var">cl</span>.<span class="fn">login</span>(<span class="str">"YOUR_USERNAME"</span>, <span class="str">"YOUR_PASSWORD"</span>)
+    <span class="var">full_caption</span> = <span class="var">caption</span> + <span class="str">"\n\n"</span> + <span class="str">" "</span>.<span class="fn">join</span>([<span class="str">f"#{h}"</span> <span class="kw">for</span> <span class="var">h</span> <span class="kw">in</span> <span class="var">hashtags</span>])
+    <span class="var">cl</span>.<span class="fn">clip_upload</span>(<span class="var">video_path</span>, <span class="var">full_caption</span>)  <span class="cm"># Reels</span></pre>
+      </div>
+    </div>
+
+    <!-- STEP 3G: Main Agent -->
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Space Mono',monospace; color:var(--accent); font-size:13px; margin-bottom:8px;">⑦ agent.py — The main orchestrator (run this!)</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">PYTHON — main agent loop</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <pre><span class="kw">from</span> <span class="var">trend_scout</span> <span class="kw">import</span> <span class="fn">get_trending_topics</span>
+<span class="kw">from</span> <span class="var">script_gen</span> <span class="kw">import</span> <span class="fn">generate_script</span>
+<span class="kw">from</span> <span class="var">image_gen</span> <span class="kw">import</span> <span class="fn">generate_image</span>
+<span class="kw">from</span> <span class="var">voice_gen</span> <span class="kw">import</span> <span class="fn">generate_voiceover</span>
+<span class="kw">from</span> <span class="var">video_composer</span> <span class="kw">import</span> <span class="fn">compose_video</span>
+<span class="kw">from</span> <span class="var">uploader</span> <span class="kw">import</span> <span class="fn">upload_to_youtube, upload_to_instagram</span>
+<span class="kw">from</span> <span class="var">apscheduler.schedulers.blocking</span> <span class="kw">import</span> <span class="fn">BlockingScheduler</span>
+<span class="kw">import</span> <span class="var">os, time</span>
+
+<span class="var">NICHES</span> = [<span class="str">"ASMR"</span>, <span class="str">"baby videos"</span>, <span class="str">"viral challenge"</span>, <span class="str">"satisfying videos"</span>]
+
+<span class="kw">def</span> <span class="fn">run_agent</span>():
+    <span class="var">niche</span> = <span class="var">NICHES</span>[<span class="var">int</span>(<span class="var">time</span>.<span class="fn">time</span>()) % <span class="fn">len</span>(<span class="var">NICHES</span>)]
+    <span class="fn">print</span>(<span class="str">f"🔍 Scouting trends for: {niche}"</span>)
+
+    <span class="var">topics</span> = <span class="fn">get_trending_topics</span>(<span class="var">niche</span>)
+    <span class="var">topic</span> = <span class="var">topics</span>[<span class="var">0</span>]  <span class="cm"># Pick #1 trending</span>
+    <span class="fn">print</span>(<span class="str">f"📈 Top trend: {topic}"</span>)
+
+    <span class="var">plan</span> = <span class="fn">generate_script</span>(<span class="var">topic</span>)
+    <span class="fn">print</span>(<span class="str">f"✍️  Script ready: {plan['title']}"</span>)
+
+    <span class="var">scenes_data</span> = []
+    <span class="kw">for</span> <span class="var">i, scene</span> <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">plan</span>[<span class="str">'scenes'</span>]):
+        <span class="var">img</span> = <span class="fn">generate_image</span>(<span class="var">scene</span>[<span class="str">'visual'</span>], <span class="str">f"scene_{i}.png"</span>)
+        <span class="var">audio</span> = <span class="fn">generate_voiceover</span>(<span class="var">scene</span>[<span class="str">'narration'</span>], <span class="str">f"audio_{i}.wav"</span>,
+                                   <span class="var">asmr_mode</span>=(<span class="var">niche</span>==<span class="str">"ASMR"</span>))
+        <span class="var">scenes_data</span>.<span class="fn">append</span>({<span class="str">'image'</span>: <span class="var">img</span>, <span class="str">'audio'</span>: <span class="var">audio</span>,
+                             <span class="str">'narration'</span>: <span class="var">scene</span>[<span class="str">'narration'</span>]})
+
+    <span class="var">video</span> = <span class="fn">compose_video</span>(<span class="var">scenes_data</span>, <span class="str">"output/final.mp4"</span>)
+    <span class="fn">print</span>(<span class="str">"🎬 Video composed!"</span>)
+
+    <span class="fn">upload_to_youtube</span>(<span class="var">video</span>, <span class="var">plan</span>[<span class="str">'title'</span>],
+                      <span class="var">plan</span>[<span class="str">'description'</span>], <span class="var">plan</span>[<span class="str">'hashtags'</span>])
+    <span class="fn">upload_to_instagram</span>(<span class="var">video</span>, <span class="var">plan</span>[<span class="str">'description'</span>], <span class="var">plan</span>[<span class="str">'hashtags'</span>])
+    <span class="fn">print</span>(<span class="str">"🚀 Posted to YouTube & Instagram!"</span>)
+
+<span class="cm"># ─── Schedule: run 3x daily automatically ─────</span>
+<span class="var">scheduler</span> = <span class="fn">BlockingScheduler</span>()
+<span class="var">scheduler</span>.<span class="fn">add_job</span>(<span class="var">run_agent</span>, <span class="str">'cron'</span>, <span class="var">hour</span>=<span class="str">'8,14,20'</span>)
+<span class="fn">print</span>(<span class="str">"⏰ Agent running 3x daily. Press Ctrl+C to stop."</span>)
+<span class="var">scheduler</span>.<span class="fn">start</span>()</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PHASE 4: STABLE DIFFUSION SETUP -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-num">PHASE 04</span>
+      <span class="section-title">Setting Up Stable Diffusion (AUTOMATIC1111)</span>
+    </div>
+    <p style="color:var(--muted); margin-bottom:20px;">This is a separate one-time setup that enables your image generation module.</p>
+
+    <ol class="step-list">
+      <li>
+        <div class="step-content">
+          <strong>Clone AUTOMATIC1111 WebUI</strong>
+          <span>Open terminal and run: <code style="background:var(--surface);padding:2px 8px;border-radius:4px;font-size:12px;color:var(--accent)">git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git</code></span>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <strong>Download a Free Model</strong>
+          <span>Go to civitai.com and download "Realistic Vision V6" (free). Place the .safetensors file in the folder: <code style="background:var(--surface);padding:2px 8px;border-radius:4px;font-size:12px;color:var(--accent)">stable-diffusion-webui/models/Stable-diffusion/</code></span>
+        </div>
+      </li>
+      <li>
+        <div class="step-content">
+          <strong>Launch with API Mode Enabled</strong>
+          <span>Navigate to the webui folder and run the command below. The <code style="background:var(--surface);padding:2px 8px;border-radius:4px;font-size:12px;color:var(--accent)">--api</code> flag is what lets your Python agent communicate with it.</span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">BASH — Launch Stable Diffusion API</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><span class="fn">cd</span> stable-diffusion-webui
+
+<span class="cm"># Windows — Run this (keep this terminal open while agent runs)</span>
+<span class="fn">webui-user.bat</span> --api --xformers --medvram
+
+<span class="cm"># --api      = enables REST API for your agent to call</span>
+<span class="cm"># --xformers = memory optimization (important for 4050)</span>
+<span class="cm"># --medvram  = optimized VRAM usage for 6GB cards</span>
+
+<span class="cm"># Verify it's running: open http://localhost:7860 in browser</span></pre>
+    </div>
+
+    <div class="info-box tip">
+      <div class="info-icon">⚡</div>
+      <div>Your RTX 4050 has 6GB VRAM. The <code style="background:var(--surface);padding:2px 6px;border-radius:3px;font-size:11px">--medvram</code> flag is key — without it, you may run out of GPU memory. With it, image generation takes ~4-8 seconds per image, which is excellent.</div>
+    </div>
+
+    <div class="info-box warn">
+      <div class="info-icon">⚠️</div>
+      <div><strong>YouTube API Setup:</strong> You need to create a project in Google Cloud Console, enable the YouTube Data API v3, and download an OAuth credentials JSON file. Search "YouTube Data API v3 Python quickstart" on Google — it's free and takes about 15 minutes. Store credentials as <code style="background:var(--surface);padding:2px 6px;border-radius:3px;font-size:11px">client_secrets.json</code> in your project root.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ROADMAP -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-num">ROADMAP</span>
+      <span class="section-title">Your Learning Timeline</span>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-phase">Week 1 — Foundation</div>
+        <div class="timeline-desc">Install Python, CUDA, Ollama, and VS Code. Get Mistral running locally. Test trend scout and script generator manually.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Week 2 — Visuals & Voice</div>
+        <div class="timeline-desc">Set up Stable Diffusion, generate your first images. Install Bark and test ASMR voiceovers. Get MoviePy rendering test videos.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Week 3 — Pipeline Integration</div>
+        <div class="timeline-desc">Connect all modules. Run agent.py end-to-end manually. Debug and tweak quality. Set up YouTube API and do a test upload.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Week 4 — Full Automation</div>
+        <div class="timeline-desc">Enable APScheduler for 3x daily runs. Add Instagram posting. Monitor performance, adjust prompts, and start scaling.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TIPS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-num">PRO TIPS</span>
+      <span class="section-title">Maximize Viral Potential</span>
+    </div>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-name" style="margin-bottom:6px;">🎯 Hook in First 3 Seconds</div>
+        <div class="tool-desc">Tell your LLM to always start narration with a shocking question or statement. This is what stops the scroll on Shorts/Reels.</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-name" style="margin-bottom:6px;">📊 A/B Test Thumbnails</div>
+        <div class="tool-desc">Generate 3 different cover images per video with different prompts. Use YouTube Studio analytics after a week to see which style wins.</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-name" style="margin-bottom:6px;">⏰ Post at Peak Hours</div>
+        <div class="tool-desc">Schedule posts at 8 AM, 2 PM, and 8 PM in your target audience's timezone. These are highest-engagement windows on both platforms.</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-name" style="margin-bottom:6px;">🔄 Rotate Niches Daily</div>
+        <div class="tool-desc">Don't post only ASMR. Rotate through ASMR → baby content → satisfying videos → challenges. This hedges against algorithm shifts.</div>
+      </div>
+    </div>
+
+    <div class="info-box tip">
+      <div class="info-icon">🎓</div>
+      <div><strong>Beginner Tip:</strong> Don't try to build everything at once. Start by running each module (trend_scout.py, script_gen.py, etc.) individually and verify it works before connecting them in agent.py. Debugging is much easier this way.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  AI VIDEO AGENT BLUEPRINT · Built for RTX 4050 · All Tools Free & Open Source
+</div>
+
+</body>
+</html>
