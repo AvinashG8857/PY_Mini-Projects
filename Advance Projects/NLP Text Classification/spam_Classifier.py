@@ -9,12 +9,12 @@ from sklearn.metrics import accuracy_score, classification_report
 
 data = {
     'text': [
-        # Spam Examples
+    
         "WINNER! Claim your prize now!",
         "URGENT! Cash bonus awaits you. Click here.",
         "Free entry to win a car. Text STOP.",
         "Congratulations! You won a $1000 gift card.",
-        # Ham Examples (Legitimate)
+  
         "Hi how are you? lets go out for coffee",
         "Are we still meeting for lunch today?",
         "Can you send me that file by 5pm?",
@@ -22,7 +22,7 @@ data = {
         "I'm running late, see you in ten minutes.",
         "I love grabbing coffee on Sunday mornings."
     ],
-    'label': ['spam', 'spam', 'spam', 'spam', 'ham', 'ham', 'ham', 'ham', 'ham', 'ham']
+    'label': ['spam', 'spam', 'spam', 'spam', 'not spam', 'not spam', 'not spam', 'not spam', 'not spam', 'not spam']
 }
 
 df=pd.DataFrame(data)
